@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: signalmap-postgres
+    environment:
+      POSTGRES_DB: signalmap
+      POSTGRES_USER: signalmap
+      POSTGRES_PASSWORD: signalmap
+    ports:
+      - "5432:5432"
+    volumes:
+      - signalmap_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U signalmap -d signalmap"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  signalmap_pgdata:
+
+# We use the PostGIS image so spatial columns are available later (heatmap
+# bbox queries). For now all H3 math happens in Java, so the H3 postgres
+# extension is NOT required.

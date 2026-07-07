@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: signalmap
+  datasource:
+    # reWriteBatchedInserts pays off later when ingestion does batch inserts.
+    url: jdbc:postgresql://localhost:5432/signalmap?reWriteBatchedInserts=true
+    username: signalmap
+    password: signalmap
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# Application-specific tuning (grows as we add features).
+signalmap:
+  h3:
+    resolution: 8   # ~0.7 km^2 cells
