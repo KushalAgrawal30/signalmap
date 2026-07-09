@@ -27,3 +27,5 @@ signalmap:
     window-days: 14          # only aggregate readings newer than this
     confidence-k: 10         # effective (weighted) samples for full confidence
     cron: "0 */5 * * * *"    # roll up every 5 minutes
+  coverage:
+    min-samples: 3

@@ -5,6 +5,8 @@ import com.uber.h3core.H3Core;
 import com.uber.h3core.util.LatLng;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Thin wrapper over the Uber H3 v4 API so the rest of the codebase never
  * touches raw H3 method names. Grows as later steps need neighbours, etc.
@@ -33,5 +35,12 @@ public class H3Service {
     public double[] centerOf(long cell) {
         LatLng c = h3.cellToLatLng(cell);
         return new double[]{c.lat, c.lng};
+    }
+
+    /** Neighbouring cells within k rings, EXCLUDING the origin cell. */
+    public List<Long> neighbours(long cell, int k) {
+        return h3.gridDisk(cell, k).stream()
+                .filter(c -> c != cell)
+                .toList();
     }
 }
