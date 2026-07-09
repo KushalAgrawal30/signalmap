@@ -22,3 +22,8 @@ management:
 signalmap:
   h3:
     resolution: 8   # ~0.7 km^2 cells
+  aggregation:
+    tau-seconds: 604800      # 7-day decay constant for time weighting
+    window-days: 14          # only aggregate readings newer than this
+    confidence-k: 10         # effective (weighted) samples for full confidence
+    cron: "0 */5 * * * *"    # roll up every 5 minutes
