@@ -43,4 +43,15 @@ public class H3Service {
                 .filter(c -> c != cell)
                 .toList();
     }
+
+    /** All cells at the configured resolution whose area intersects the bbox. */
+    public List<Long> cellsInBbox(double minLat, double minLng, double maxLat, double maxLng) {
+        List<LatLng> polygon = List.of(
+                new LatLng(minLat, minLng),
+                new LatLng(minLat, maxLng),
+                new LatLng(maxLat, maxLng),
+                new LatLng(maxLat, minLng)
+        );
+        return h3.polygonToCells(polygon, List.of(), resolution);
+    }
 }
