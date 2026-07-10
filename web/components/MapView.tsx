@@ -53,11 +53,21 @@ function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }
   return null;
 }
 
+function FlyTo({ target }: { target: { lat: number; lng: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 14));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+  return null;
+}
+
 export default function MapView({
-  operator, marker, onPick,
+  operator, marker, focus, onPick,
 }: {
   operator: string;
   marker: { lat: number; lng: number } | null;
+  focus: { lat: number; lng: number } | null;
   onPick: (lat: number, lng: number) => void;
 }) {
   return (
@@ -68,6 +78,7 @@ export default function MapView({
       />
       <HeatmapLayer operator={operator} />
       <ClickHandler onPick={onPick} />
+      <FlyTo target={focus} />
       {marker && <Marker position={[marker.lat, marker.lng]} icon={markerIcon} />}
     </MapContainer>
   );

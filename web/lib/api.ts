@@ -45,3 +45,24 @@ export async function getHeatmap(b: Bounds, operator: string): Promise<HeatmapCe
   if (!r.ok) return [];
   return r.json();
 }
+
+export interface GeoResult {
+  label: string;
+  lat: number;
+  lng: number;
+}
+
+
+export async function geocode(query: string): Promise<GeoResult[]> {
+  const p = new URLSearchParams({ q: query, format: "json", limit: "5" });
+  const r = await fetch(`https://nominatim.openstreetmap.org/search?${p}`, {
+    headers: { "Accept-Language": "en" },
+  });
+  if (!r.ok) throw new Error(`geocode ${r.status}`);
+  const data = await r.json();
+  return data.map((d: { display_name: string; lat: string; lon: string }) => ({
+    label: d.display_name,
+    lat: parseFloat(d.lat),
+    lng: parseFloat(d.lon),
+  }));
+}
