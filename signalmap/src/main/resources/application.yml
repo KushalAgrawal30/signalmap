@@ -8,6 +8,13 @@ spring:
     password: signalmap
   flyway:
     enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    cache:
+      type: redis
+
 
 server:
   port: 8080

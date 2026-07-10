@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class AggregationService {
@@ -48,6 +49,7 @@ public class AggregationService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "coverage", allEntries = true)
     public int run() {
         var params = new MapSqlParameterSource()
                 .addValue("resolution", resolution)
