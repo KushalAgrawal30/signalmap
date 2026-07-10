@@ -56,6 +56,23 @@ export default function Home() {
     query(la, ln, operator);
   }
 
+  function locateMe() {
+    if (!navigator.geolocation) {
+      setError("Geolocation isn't supported by this browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const la = pos.coords.latitude, ln = pos.coords.longitude;
+        setLat(la.toFixed(6));
+        setLng(ln.toFixed(6));
+        setFocus({ lat: la, lng: ln });
+        query(la, ln, operator);
+      },
+      () => setError("Couldn't get your location (permission denied?)."),
+    );
+  }
+
   const showEmpty = !loading && !result && !error;
 
   return (
@@ -67,7 +84,13 @@ export default function Home() {
       <aside className="panel">
         <h1>SignalMap</h1>
         <p className="sub">Search, click the map, or enter coordinates.</p>
-
+        <button type="button" className="locate" onClick={locateMe}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 21s-6-5.5-6-10a6 6 0 1 1 12 0c0 4.5-6 10-6 10z" />
+            <circle cx="12" cy="11" r="2" />
+          </svg>
+          Use my location
+        </button>
         <SearchBox onSelect={onSelectPlace} />
 
         <form onSubmit={onSubmit} className="form">
@@ -157,8 +180,11 @@ function CompareList({ rows }: { rows: CoverageResponse[] }) {
 function Legend() {
   return (
     <div className="legend">
+      <div className="legend-head">Signal quality</div>
       <div className="legend-bar" />
-      <div className="legend-labels"><span>weak</span><span>strong</span></div>
+      <div className="legend-ticks">
+        {[0, 1, 2, 3, 4, 5].map((n) => <span key={n}>{n}</span>)}
+      </div>
       <p className="legend-note">Faded cells = lower confidence (fewer readings)</p>
     </div>
   );

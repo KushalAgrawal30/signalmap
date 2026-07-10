@@ -33,6 +33,7 @@ body {
   z-index: 1000;
   width: 320px;
   max-height: calc(100vh - 32px);
+  overflow-x: hidden;
   overflow-y: auto;
   background: rgba(20, 24, 33, .92);
   backdrop-filter: blur(8px);
@@ -78,6 +79,8 @@ body {
 
 .form input,
 .form select {
+  width: 100%;
+  min-width: 0;
   background: #0e1117;
   border: 1px solid rgba(255, 255, 255, .12);
   color: #e6e6e6;
@@ -373,5 +376,76 @@ body {
 @keyframes shimmer {
   to {
     background-position: -200% 0;
+  }
+}
+
+/* --- locate button --- */
+.locate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: transparent;
+  color: #9aa4b2;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.locate:hover {
+  color: #e6e6e6;
+  border-color: rgba(255, 255, 255, .25);
+}
+
+/* --- hex hover tooltip --- */
+.leaflet-tooltip.hex-tip {
+  background: #141821;
+  color: #e6e6e6;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 6px 9px;
+}
+
+.leaflet-tooltip.hex-tip::before {
+  display: none;
+}
+
+/* --- numeric legend --- */
+.legend-head {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #9aa4b2;
+  margin-bottom: 6px;
+}
+
+.legend-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #9aa4b2;
+  margin-top: 4px;
+}
+
+/* --- responsive: panel becomes a bottom sheet on phones --- */
+@media (max-width: 640px) {
+  .panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-height: 58vh;
+    border-radius: 16px 16px 0 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
   }
 }
