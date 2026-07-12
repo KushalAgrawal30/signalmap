@@ -1,4 +1,4 @@
-export type Source = "MEASURED" | "FALLBACK" | "NO_DATA";
+export type Source = "MEASURED" | "PREDICTED" | "FALLBACK" | "NO_DATA";
 
 export interface CoverageResponse {
   h3Index: string;

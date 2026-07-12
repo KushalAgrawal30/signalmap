@@ -36,3 +36,21 @@ signalmap:
     cron: "0 */5 * * * *"    # roll up every 5 minutes
   coverage:
     min-samples: 3
+
+
+
+# ML prediction sidecar (Python FastAPI). If it's down, coverage queries
+# degrade to the neighbour-average fallback rather than failing.
+ml:
+  base-url: http://localhost:8000
+  timeout-ms: 400
+  enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      mlPredict:
+        sliding-window-size: 20
+        failure-rate-threshold: 50        # >50% failures -> open the circuit
+        wait-duration-in-open-state: 30s  # stop calling ML for 30s
+        permitted-number-of-calls-in-half-open-state: 3

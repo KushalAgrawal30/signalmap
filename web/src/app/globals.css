@@ -449,3 +449,5 @@ body {
     border-bottom: 0;
   }
 }
+
+.badge.predicted { background: rgba(47,129,247,.2); color: #79b0ff; }

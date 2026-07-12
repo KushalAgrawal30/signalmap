@@ -121,6 +121,7 @@ export default function Home() {
 function badgeClass(source: string) {
   if (source === "MEASURED") return "badge measured";
   if (source === "FALLBACK") return "badge fallback";
+  if (source === "PREDICTED") return "badge predicted";
   return "badge nodata";
 }
 
@@ -153,6 +154,9 @@ function ResultCard({ r }: { r: CoverageResponse }) {
             <span>Confidence {((r.confidence ?? 0) * 100).toFixed(0)}%</span>
             <span>{r.sampleCount} samples</span>
           </div>
+          {r.source === "PREDICTED" && (
+            <p className="muted small">ML estimate from surrounding coverage — no direct readings here.</p>
+          )}
           {r.source === "FALLBACK" && (
             <p className="muted small">Estimated from neighbouring cells — no direct readings here.</p>
           )}

@@ -10,7 +10,7 @@ public record CoverageResponse(
         Integer sampleCount,
         Source source
 ) {
-    public enum Source { MEASURED, FALLBACK, NO_DATA }
+    public enum Source { MEASURED, PREDICTED, FALLBACK, NO_DATA }
 
     public static CoverageResponse noData(long cell, double[] center, String operator) {
         return new CoverageResponse(Long.toUnsignedString(cell), center[0], center[1],
