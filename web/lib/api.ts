@@ -36,10 +36,13 @@ export async function compareCoverage(lat: number, lng: number): Promise<Coverag
   return r.json();
 }
 
-export async function getHeatmap(b: Bounds, operator: string): Promise<HeatmapCell[]> {
+export async function getHeatmap(
+  b: Bounds, operator: string, zoom: number
+): Promise<HeatmapCell[]> {
   const p = new URLSearchParams({
     minLat: String(b.minLat), minLng: String(b.minLng),
-    maxLat: String(b.maxLat), maxLng: String(b.maxLng), operator,
+    maxLat: String(b.maxLat), maxLng: String(b.maxLng),
+    operator, zoom: String(zoom),
   });
   const r = await fetch(`/v1/heatmap?${p}`);
   if (!r.ok) return [];

@@ -54,4 +54,20 @@ public class H3Service {
         );
         return h3.polygonToCells(polygon, List.of(), resolution);
     }
+
+    /** The ancestor of a cell at a coarser resolution. */
+    public long parentOf(long cell, int targetResolution) {
+        return h3.cellToParent(cell, targetResolution);
+    }
+
+    public int resolutionForZoom(int zoom) {
+        int r;
+        if (zoom <= 5)       r = 3;   // country
+        else if (zoom <= 7)  r = 4;   // large region
+        else if (zoom <= 9)  r = 5;   // metro area
+        else if (zoom <= 10) r = 6;
+        else if (zoom <= 12) r = 7;
+        else                 r = 8;   // street level: the storage resolution
+        return Math.min(r, resolution);
+    }
 }

@@ -12,7 +12,8 @@ public class AggregationService {
 
     private static final String ROLLUP_SQL = """
             INSERT INTO hex_cells
-                (h3_index, resolution, operator_id, quality_score, sample_count, confidence, last_updated)
+                (h3_index, resolution, operator_id, quality_score, sample_count,
+                 confidence, center_lat, center_lng, last_updated)
             SELECT
                 w.h3_index,
                 :resolution,
@@ -20,12 +21,16 @@ public class AggregationService {
                 SUM(w.weight * w.quality) / NULLIF(SUM(w.weight), 0)  AS quality_score,
                 COUNT(*)                                             AS sample_count,
                 LEAST(1.0, SUM(w.weight) / :confidenceK)             AS confidence,
+                AVG(w.lat)                                           AS center_lat,
+                AVG(w.lng)                                           AS center_lng,
                 now()                                               AS last_updated
             FROM (
                 SELECT
                     h3_index,
                     operator_id,
                     quality,
+                    lat,
+                    lng,
                     exp( - EXTRACT(EPOCH FROM (now() - recorded_at)) / :tauSeconds ) AS weight
                 FROM readings
                 WHERE recorded_at > now() - make_interval(days => :windowDays)
@@ -35,6 +40,8 @@ public class AggregationService {
                 quality_score = EXCLUDED.quality_score,
                 sample_count  = EXCLUDED.sample_count,
                 confidence    = EXCLUDED.confidence,
+                center_lat    = EXCLUDED.center_lat,
+                center_lng    = EXCLUDED.center_lng,
                 last_updated  = EXCLUDED.last_updated
             """;
 

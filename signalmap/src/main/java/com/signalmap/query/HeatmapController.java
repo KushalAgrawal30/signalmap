@@ -17,12 +17,14 @@ public class HeatmapController {
         this.service = service;
     }
 
+    /** GET /v1/heatmap?minLat=..&minLng=..&maxLat=..&maxLng=..&operator=Jio&zoom=12 */
     @GetMapping
     public List<HeatmapCell> heatmap(@RequestParam double minLat,
                                      @RequestParam double minLng,
                                      @RequestParam double maxLat,
                                      @RequestParam double maxLng,
-                                     @RequestParam String operator) {
-        return service.heatmap(minLat, minLng, maxLat, maxLng, operator);
+                                     @RequestParam String operator,
+                                     @RequestParam(defaultValue = "12") int zoom) {
+        return service.heatmap(minLat, minLng, maxLat, maxLng, operator, zoom);
     }
 }

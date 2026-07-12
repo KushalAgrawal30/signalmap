@@ -27,7 +27,7 @@ function HeatmapLayer({ operator }: { operator: string }) {
     const data = await getHeatmap({
       minLat: b.getSouth(), minLng: b.getWest(),
       maxLat: b.getNorth(), maxLng: b.getEast(),
-    }, operator);
+    }, operator, map.getZoom());
     if (id === reqId.current) setCells(data);
   }
 
