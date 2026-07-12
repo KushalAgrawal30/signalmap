@@ -24,17 +24,37 @@ SPREAD_DEG = 0.12  # ~13 km box around the center
 
 OPERATORS = ["Airtel", "Jio", "Vi", "BSNL"]
 
+# Each operator gets a base quality (0..5), a broad coverage "focus" point,
+# and a set of TOWERS. Towers create sharp local peaks -- this is what makes the
+# world hard enough that a flat neighbour-average can't predict it, and it's also
+# how real coverage actually works (signal is tower-driven, not smoothly varying).
 OPERATOR_PROFILE = {
-    "Airtel": {"base": 4.2, "focus": (13.06, 80.25)},
-    "Jio":    {"base": 4.4, "focus": (13.10, 80.28)},
-    "Vi":     {"base": 3.4, "focus": (13.08, 80.24)},
-    "BSNL":   {"base": 2.6, "focus": (13.05, 80.30)},
+    "Airtel": {"base": 3.4, "focus": (13.06, 80.25)},
+    "Jio":    {"base": 3.6, "focus": (13.10, 80.28)},
+    "Vi":     {"base": 2.8, "focus": (13.08, 80.24)},
+    "BSNL":   {"base": 2.1, "focus": (13.05, 80.30)},
 }
 
+TOWERS_PER_OPERATOR = 7
+TOWER_BOOST = 1.8       # how much a tower lifts nearby cells
+TOWER_RADIUS = 0.012    # ~1.3 km -- sharp, local
+
+# Dead zones now have a HARD edge (a cliff, not a taper), so cells just inside
+# differ sharply from their neighbours just outside.
 DEAD_ZONES = [
-    (13.11, 80.23, 0.020, 3.0),
-    (13.04, 80.29, 0.015, 2.5),
+    (13.11, 80.23, 0.018, 3.0),
+    (13.04, 80.29, 0.014, 2.6),
+    (13.09, 80.30, 0.010, 2.4),
 ]
+
+# Fixed tower layout (seeded) so the map is stable across runs.
+_tower_rng = random.Random(20260712)
+TOWERS = {
+    op: [(CENTER_LAT + _tower_rng.uniform(-SPREAD_DEG, SPREAD_DEG),
+          CENTER_LNG + _tower_rng.uniform(-SPREAD_DEG, SPREAD_DEG))
+         for _ in range(TOWERS_PER_OPERATOR)]
+    for op in OPERATORS
+}
 
 
 def clamp(v, lo, hi):
@@ -42,18 +62,25 @@ def clamp(v, lo, hi):
 
 
 def quality_at(lat, lng, operator):
+    """The 'true' underlying signal quality at a point for an operator."""
     prof = OPERATOR_PROFILE[operator]
     q = prof["base"]
-    fl, fn = prof["focus"]
-    dist = math.hypot(lat - fl, lng - fn)
-    q -= dist * 12.0
-    for dz_lat, dz_lng, radius, strength in DEAD_ZONES:
-        d = math.hypot(lat - dz_lat, lng - dz_lng)
-        if d < radius:
-            q -= strength * (1 - d / radius)
-    q += random.gauss(0, 0.3)
-    return clamp(q, 0.0, 5.0)
 
+    # Broad degradation with distance from the operator's focus area.
+    fl, fn = prof["focus"]
+    q -= math.hypot(lat - fl, lng - fn) * 8.0
+
+    # Tower boost: a sharp Gaussian peak around the nearest tower.
+    nearest = min(math.hypot(lat - t[0], lng - t[1]) for t in TOWERS[operator])
+    q += TOWER_BOOST * math.exp(-((nearest / TOWER_RADIUS) ** 2))
+
+    # Dead zones: a hard cliff, not a smooth taper.
+    for dz_lat, dz_lng, radius, strength in DEAD_ZONES:
+        if math.hypot(lat - dz_lat, lng - dz_lng) < radius:
+            q -= strength
+
+    q += random.gauss(0, 0.35)  # measurement noise (real readings are noisy)
+    return clamp(q, 0.0, 5.0)
 
 def reading_from_quality(q):
     rssi = int(-105 + (q / 5.0) * 40 + random.gauss(0, 3))
